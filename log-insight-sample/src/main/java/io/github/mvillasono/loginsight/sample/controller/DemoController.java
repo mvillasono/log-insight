@@ -14,6 +14,13 @@ import java.util.Map;
  * Endpoints de demo que generan distintos tipos de errores.
  * Úsalos para ver el dashboard de Log Insight en acción.
  *
+ * — Severidad por nivel —
+ * GET /demo/critical          → corrupción de datos + pérdida de transacciones (CRITICAL)
+ * GET /demo/high              → base de datos primaria caída (HIGH)
+ * GET /demo/medium            → timeout en API externa con reintentos fallidos (MEDIUM)
+ * GET /demo/low               → uso de API deprecada con fallback (LOW)
+ *
+ * — Otros errores —
  * GET /demo/null-pointer      → NullPointerException
  * GET /demo/database-timeout  → connection timeout simulado
  * GET /demo/auth-error        → error de autenticación con datos sensibles
@@ -27,7 +34,49 @@ public class DemoController {
 
     private static final Logger log = LoggerFactory.getLogger(DemoController.class);
 
-    // ── Endpoints de demo ────────────────────────────────────────
+    // ── Endpoints por severidad ──────────────────────────────────
+
+    @GetMapping("/critical")
+    public String critical() {
+        log.error("FATAL: Data corruption detected in orders table. " +
+                "Transaction rollback FAILED — 847 records may be in inconsistent state. " +
+                "Primary key constraint violated during batch insert. " +
+                "Database integrity compromised. Immediate DBA intervention required.");
+        throw new RuntimeException("Database integrity violation — data loss detected");
+    }
+
+    @GetMapping("/high")
+    public String high() {
+        try {
+            simulatePrimaryDbDown();
+        } catch (RuntimeException ex) {
+            log.error("Primary database unreachable. Failover to replica FAILED. " +
+                    "All write operations are rejected. Service is partially degraded. " +
+                    "Connection attempts: 5/5 exhausted. Last error: Connection refused at db-primary:5432", ex);
+            throw ex;
+        }
+        return "ok";
+    }
+
+    @GetMapping("/medium")
+    public String medium() {
+        log.error("External payment API timeout after 3 retry attempts. " +
+                "Endpoint: https://api.payments.example.com/charge " +
+                "Response time: 30000ms (threshold: 5000ms). " +
+                "Requests in queue: 12. Falling back to async processing.");
+        throw new RuntimeException("Payment gateway timeout — transaction queued for retry");
+    }
+
+    @GetMapping("/low")
+    public String low() {
+        log.warn("Deprecated method UserService.findByEmailLegacy() called from OrderController.checkout(). " +
+                "This method will be removed in v3.0.0. " +
+                "Migrate to UserService.findByEmail() before next release. " +
+                "Fallback applied — functionality unaffected.");
+        return "Warning logged — check the dashboard";
+    }
+
+    // ── Otros endpoints de demo ──────────────────────────────────
 
     @GetMapping("/null-pointer")
     public String nullPointer() {
@@ -73,7 +122,12 @@ public class DemoController {
         return Map.of(
                 "status", "UP",
                 "dashboard", "http://localhost:8080/log-insight",
-                "hint", "Call /demo/null-pointer, /demo/database-timeout, /demo/auth-error to generate errors"
+                "severity-demos", Map.of(
+                        "CRITICAL", "/demo/critical",
+                        "HIGH",     "/demo/high",
+                        "MEDIUM",   "/demo/medium",
+                        "LOW",      "/demo/low"
+                )
         );
     }
 
@@ -96,6 +150,12 @@ public class DemoController {
     private void simulateDatabaseQuery(String sql) {
         throw new RuntimeException(
                 "HikariPool-1 — Connection is not available, request timed out after 30000ms"
+        );
+    }
+
+    private void simulatePrimaryDbDown() {
+        throw new RuntimeException(
+                "Unable to acquire JDBC Connection — db-primary:5432 connection refused"
         );
     }
 }
