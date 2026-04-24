@@ -11,6 +11,8 @@
 
 Log Insight es un Spring Boot Starter que intercepta errores de tus microservicios, los sanitiza automáticamente para proteger datos sensibles, y los envía a un modelo de IA (OpenAI, Anthropic, Ollama, etc.) para obtener análisis de causa raíz y sugerencias concretas — todo disponible en un dashboard web integrado accesible desde tu propia aplicación.
 
+**Disponible en Maven Central:** [io.github.mvillasono » log-insight-spring-boot-starter](https://central.sonatype.com/artifact/io.github.mvillasono/log-insight-spring-boot-starter)
+
 ---
 
 ## Características
@@ -40,7 +42,7 @@ Log Insight es un Spring Boot Starter que intercepta errores de tus microservici
 <!-- Agregar el provider de IA que prefieras -->
 <dependency>
     <groupId>org.springframework.ai</groupId>
-    <artifactId>spring-ai-openai-spring-boot-starter</artifactId>
+    <artifactId>spring-ai-starter-model-openai</artifactId>
     <version>1.0.0</version>
 </dependency>
 ```
@@ -48,7 +50,7 @@ Log Insight es un Spring Boot Starter que intercepta errores de tus microservici
 **Gradle:**
 ```groovy
 implementation 'io.github.mvillasono:log-insight-spring-boot-starter:1.0.0'
-implementation 'org.springframework.ai:spring-ai-openai-spring-boot-starter:1.0.0'
+implementation 'org.springframework.ai:spring-ai-starter-model-openai:1.0.0'
 ```
 
 ### 2. Configurar
@@ -145,10 +147,10 @@ log-insight:
 
 | Provider | Starter |
 |----------|---------|
-| OpenAI | `spring-ai-openai-spring-boot-starter` |
-| Anthropic (Claude) | `spring-ai-anthropic-spring-boot-starter` |
-| Ollama (local/gratis) | `spring-ai-ollama-spring-boot-starter` |
-| Azure OpenAI | `spring-ai-azure-openai-spring-boot-starter` |
+| OpenAI | `spring-ai-starter-model-openai` |
+| Anthropic (Claude) | `spring-ai-starter-model-anthropic` |
+| Ollama (local/gratis) | `spring-ai-starter-model-ollama` |
+| Azure OpenAI | `spring-ai-starter-model-azure-openai` |
 
 ---
 
