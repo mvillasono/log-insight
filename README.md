@@ -328,6 +328,34 @@ Para otros proveedores: `spring.ai.anthropic.api-key`, `spring.ai.ollama.base-ur
 
 Ver la [tabla de providers](#providers-de-ia-soportados) para otros proveedores. La configuración en `application.yml` (api-key, model, etc.) **no es suficiente** sin esta dependencia en el classpath.
 
+### El dashboard `/log-insight` devuelve 404
+
+**Causa más común:** Si tu proyecto tiene Spring Security, todas las rutas están protegidas por defecto, incluidas las de Log Insight.
+
+**Solución:** Permite el acceso a las rutas del dashboard en tu configuración de seguridad:
+
+```java
+@Bean
+public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    http.authorizeHttpRequests(auth -> auth
+        .requestMatchers("/log-insight/**").permitAll()
+        .anyRequest().authenticated()
+    );
+    return http.build();
+}
+```
+
+O si usas configuración por propiedades:
+
+```yaml
+spring:
+  security:
+    filter:
+      order: 10
+```
+
+> **Nota:** Exponer `/log-insight` sin autenticación muestra logs internos de tu aplicación. Evalúa restringir el acceso solo a redes internas o roles administrativos en entornos de producción.
+
 ---
 
 ## Contribuir

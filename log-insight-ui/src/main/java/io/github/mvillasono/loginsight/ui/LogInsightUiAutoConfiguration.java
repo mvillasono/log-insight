@@ -1,8 +1,10 @@
 package io.github.mvillasono.loginsight.ui;
 
+import io.github.mvillasono.loginsight.autoconfigure.LogInsightAutoConfiguration;
 import io.github.mvillasono.loginsight.autoconfigure.store.AnalysisStore;
 import io.github.mvillasono.loginsight.ui.api.LogInsightApiController;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
+import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
@@ -10,6 +12,7 @@ import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @AutoConfiguration
+@AutoConfigureAfter(LogInsightAutoConfiguration.class)
 @ConditionalOnProperty(prefix = "log-insight.ui", name = "enabled", havingValue = "true", matchIfMissing = true)
 @ConditionalOnBean(AnalysisStore.class)
 public class LogInsightUiAutoConfiguration implements WebMvcConfigurer {
