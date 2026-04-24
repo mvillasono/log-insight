@@ -24,14 +24,11 @@ public class LogInsightProperties {
 
     public static class AiProperties {
         private String provider = "openai";
-        private String apiKey;
         private String model = "gpt-4o-mini";
         private String language = "English";
 
         public String getProvider()          { return provider; }
         public void setProvider(String v)    { this.provider = v; }
-        public String getApiKey()            { return apiKey; }
-        public void setApiKey(String v)      { this.apiKey = v; }
         public String getModel()             { return model; }
         public void setModel(String v)       { this.model = v; }
         public String getLanguage()          { return language; }

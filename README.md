@@ -31,15 +31,17 @@ Log Insight es un Spring Boot Starter que intercepta errores de tus microservici
 
 ### 1. Agregar dependencia
 
+> **Requisito obligatorio:** Log Insight necesita que declares en tu proyecto el starter del proveedor de IA que vayas a usar. Sin él, Spring no puede crear el bean `ChatClient.Builder` y la aplicación no arrancará. Ver la [tabla de providers](#providers-de-ia-soportados) para elegir el que corresponda.
+
 **Maven:**
 ```xml
 <dependency>
     <groupId>io.github.mvillasono</groupId>
     <artifactId>log-insight-spring-boot-starter</artifactId>
-    <version>1.0.0</version>
+    <version>1.0.1</version>
 </dependency>
 
-<!-- Agregar el provider de IA que prefieras -->
+<!-- OBLIGATORIO: elige el starter del provider que vayas a usar -->
 <dependency>
     <groupId>org.springframework.ai</groupId>
     <artifactId>spring-ai-starter-model-openai</artifactId>
@@ -49,26 +51,30 @@ Log Insight es un Spring Boot Starter que intercepta errores de tus microservici
 
 **Gradle:**
 ```groovy
-implementation 'io.github.mvillasono:log-insight-spring-boot-starter:1.0.0'
+implementation 'io.github.mvillasono:log-insight-spring-boot-starter:1.0.1'
+// OBLIGATORIO: elige el starter del provider que vayas a usar
 implementation 'org.springframework.ai:spring-ai-starter-model-openai:1.0.0'
 ```
 
 ### 2. Configurar
 
+> **Importante:** La API key del proveedor de IA se configura bajo `spring.ai.<provider>.api-key`, **no** bajo `log-insight.ai`. Log Insight delega la conexión al proveedor a Spring AI.
+
 ```yaml
 # application.yml
+spring:
+  ai:
+    openai:
+      api-key: ${OPENAI_API_KEY}   # requerido por Spring AI OpenAI
+      chat:
+        options:
+          model: gpt-4o-mini
+
 log-insight:
   enabled: true
   ai:
-    provider: openai
-    api-key: ${OPENAI_API_KEY}
-    model: gpt-4o-mini
-
-spring:
-  data:
-    redis:
-      host: localhost
-      port: 6379
+    provider: openai               # solo para trazabilidad en logs
+    language: Spanish              # idioma de las respuestas de análisis
 ```
 
 ### 3. Listo
@@ -84,13 +90,20 @@ Los errores de tu aplicación se analizan automáticamente y aparecen en el dash
 ## Configuración completa
 
 ```yaml
+# La API key y el modelo se configuran bajo spring.ai, no bajo log-insight.
+spring:
+  ai:
+    openai:
+      api-key: ${OPENAI_API_KEY}
+      chat:
+        options:
+          model: gpt-4o-mini
+
 log-insight:
   enabled: true
 
   ai:
-    provider: openai          # openai | anthropic | ollama
-    api-key: ${OPENAI_API_KEY}
-    model: gpt-4o-mini        # elige el modelo según tu presupuesto
+    provider: openai          # openai | anthropic | ollama (solo trazabilidad)
 
   capture:
     levels: [ERROR, WARN]     # niveles a capturar
@@ -145,12 +158,14 @@ log-insight:
 
 ## Providers de IA soportados
 
-| Provider | Starter |
-|----------|---------|
-| OpenAI | `spring-ai-starter-model-openai` |
-| Anthropic (Claude) | `spring-ai-starter-model-anthropic` |
-| Ollama (local/gratis) | `spring-ai-starter-model-ollama` |
-| Azure OpenAI | `spring-ai-starter-model-azure-openai` |
+Debes declarar **exactamente uno** de estos starters en tu proyecto. Log Insight usa la abstracción `ChatClient` de Spring AI, pero el bean que la implementa lo registra el starter del provider concreto.
+
+| Provider | Starter Maven/Gradle | Versión |
+|----------|---------------------|---------|
+| OpenAI | `spring-ai-starter-model-openai` | 1.0.0 |
+| Anthropic (Claude) | `spring-ai-starter-model-anthropic` | 1.0.0 |
+| Ollama (local/gratis) | `spring-ai-starter-model-ollama` | 1.0.0 |
+| Azure OpenAI | `spring-ai-starter-model-azure-openai` | 1.0.0 |
 
 ---
 
@@ -271,6 +286,46 @@ http://localhost:8080/log-insight
 ```
 
 > El sample incluye endpoints que generan errores de ejemplo para ver el dashboard en acción sin necesitar una app real.
+
+---
+
+## Solución de problemas
+
+### `OpenAI API key must be set. Use the connection property: spring.ai.openai.api-key`
+
+**Causa:** La propiedad `log-insight.ai.api-key` no existe ni es leída por Spring AI. La API key debe configurarse bajo las propiedades nativas de Spring AI, que son las que usa la autoconfiguración del proveedor.
+
+**Solución:** Agrega la clave en `application.yml` bajo `spring.ai`:
+
+```yaml
+spring:
+  ai:
+    openai:
+      api-key: ${OPENAI_API_KEY}
+      chat:
+        options:
+          model: gpt-4o-mini
+```
+
+Para otros proveedores: `spring.ai.anthropic.api-key`, `spring.ai.ollama.base-url`, etc.
+
+---
+
+### `Parameter 0 of method aiAnalysisService required a bean of type 'ChatClient$Builder' that could not be found`
+
+**Causa:** Falta el starter del proveedor de IA en el classpath del proyecto que consume la librería. Log Insight incluye únicamente las abstracciones de Spring AI (`spring-ai-client-chat`), pero el bean `ChatClient.Builder` lo registra la autoconfiguración del provider concreto.
+
+**Solución:** Agrega el starter correspondiente a tu `pom.xml` o `build.gradle`. Ejemplo con OpenAI:
+
+```xml
+<dependency>
+    <groupId>org.springframework.ai</groupId>
+    <artifactId>spring-ai-starter-model-openai</artifactId>
+    <version>1.0.0</version>
+</dependency>
+```
+
+Ver la [tabla de providers](#providers-de-ia-soportados) para otros proveedores. La configuración en `application.yml` (api-key, model, etc.) **no es suficiente** sin esta dependencia en el classpath.
 
 ---
 
