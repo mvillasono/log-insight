@@ -38,7 +38,7 @@ Log Insight es un Spring Boot Starter que intercepta errores de tus microservici
 <dependency>
     <groupId>io.github.mvillasono</groupId>
     <artifactId>log-insight-spring-boot-starter</artifactId>
-    <version>1.0.1</version>
+    <version>1.0.2</version>
 </dependency>
 
 <!-- OBLIGATORIO: elige el starter del provider que vayas a usar -->
@@ -51,7 +51,7 @@ Log Insight es un Spring Boot Starter que intercepta errores de tus microservici
 
 **Gradle:**
 ```groovy
-implementation 'io.github.mvillasono:log-insight-spring-boot-starter:1.0.1'
+implementation 'io.github.mvillasono:log-insight-spring-boot-starter:1.0.2'
 // OBLIGATORIO: elige el starter del provider que vayas a usar
 implementation 'org.springframework.ai:spring-ai-starter-model-openai:1.0.0'
 ```
