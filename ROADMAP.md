@@ -19,7 +19,7 @@ La base funcional de la librería.
 - [x] Sink `console` habilitado por defecto
 - [x] App de demo (`log-insight-sample`) con endpoints de error y configuración documentada
 - [x] GitHub Actions CI/CD (build, tests, CodeQL)
-- [ ] Publicación en Maven Central
+- [x] Publicación en Maven Central
 
 ---
 
