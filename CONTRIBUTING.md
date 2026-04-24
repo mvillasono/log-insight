@@ -24,10 +24,29 @@ mvn spring-boot:run
 
 ---
 
+## Estrategia de ramas
+
+| Rama | Propósito |
+|------|-----------|
+| `main` | Siempre estable. Solo recibe merges de PRs revisados. Cada release se etiqueta aquí (`v1.0.0`, `v1.1.0`…) |
+| `feature/<nombre>` | Una rama por feature o fix. Vida corta — se elimina tras el merge |
+
+No usamos GitFlow (`develop`, `release/*`, `hotfix/*`). La única rama permanente es `main`.
+
+Convenciones de nombre:
+
+```
+feature/sink-slack
+fix/redis-timeout-npe
+docs/contributing-guide
+```
+
+---
+
 ## Flujo para contribuir
 
 1. Haz **fork** del repositorio
-2. Crea una rama descriptiva: `git checkout -b feature/sink-teams`
+2. Crea una rama descriptiva desde `main`: `git checkout -b feature/sink-teams`
 3. Escribe tu código y sus tests
 4. Abre un **Pull Request** hacia `main`
 5. Espera la revisión — CI debe pasar antes del merge
