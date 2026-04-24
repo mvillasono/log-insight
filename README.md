@@ -328,33 +328,74 @@ Para otros proveedores: `spring.ai.anthropic.api-key`, `spring.ai.ollama.base-ur
 
 Ver la [tabla de providers](#providers-de-ia-soportados) para otros proveedores. La configuración en `application.yml` (api-key, model, etc.) **no es suficiente** sin esta dependencia en el classpath.
 
-### El dashboard `/log-insight` devuelve 404
+### El dashboard `/log-insight` devuelve 404 o 401
 
-**Causa más común:** Si tu proyecto tiene Spring Security, todas las rutas están protegidas por defecto, incluidas las de Log Insight.
+Si tu proyecto usa Spring Security, las rutas de Log Insight pueden quedar bloqueadas. A continuación los casos más comunes:
 
-**Solución:** Permite el acceso a las rutas del dashboard en tu configuración de seguridad:
+---
+
+#### Caso 1: Spring Security con configuración estándar
+
+Agrega `/log-insight/**` al `permitAll()` de tu `SecurityFilterChain`:
 
 ```java
 @Bean
 public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
     http.authorizeHttpRequests(auth -> auth
-        .requestMatchers("/log-insight/**").permitAll()
+        .requestMatchers("/actuator/health", "/log-insight/**").permitAll()
         .anyRequest().authenticated()
     );
     return http.build();
 }
 ```
 
-O si usas configuración por propiedades:
+---
 
-```yaml
-spring:
-  security:
-    filter:
-      order: 10
+#### Caso 2: Filtro custom de API Key (`OncePerRequestFilter`)
+
+Si tienes un filtro que valida un header (como `X-API-Key`) y corre **antes** que las reglas de `SecurityFilterChain`, el `permitAll()` no es suficiente — el filtro intercepta la petición antes de que Spring Security la autorice. Debes excluir las rutas en `shouldNotFilter`:
+
+```java
+@Override
+protected boolean shouldNotFilter(HttpServletRequest request) {
+    String path = request.getRequestURI();
+    return path.contains("/actuator/health")
+            || path.contains("/actuator/info")
+            || path.contains("/log-insight");  // añadir esta línea
+}
 ```
 
-> **Nota:** Exponer `/log-insight` sin autenticación muestra logs internos de tu aplicación. Evalúa restringir el acceso solo a redes internas o roles administrativos en entornos de producción.
+Y además mantener el `permitAll()` en el `SecurityFilterChain` como en el Caso 1.
+
+---
+
+#### Caso 3: Filtro JWT (`OncePerRequestFilter`)
+
+Igual que el Caso 2 — si el filtro JWT intercepta todas las rutas, excluye `/log-insight` en `shouldNotFilter`:
+
+```java
+@Override
+protected boolean shouldNotFilter(HttpServletRequest request) {
+    String path = request.getRequestURI();
+    return path.startsWith("/log-insight");
+}
+```
+
+---
+
+#### Caso 4: La aplicación tiene `server.servlet.context-path`
+
+Si tu app tiene un context path configurado (por ejemplo `/api/v1`), la URL del dashboard incluye ese prefijo:
+
+```
+http://localhost:8080/api/v1/log-insight
+```
+
+Las reglas de `SecurityFilterChain` y `shouldNotFilter` se escriben **sin** el context path (Spring lo gestiona internamente).
+
+---
+
+> **Nota de seguridad:** El dashboard expone logs internos de tu aplicación. En producción evalúa restringir el acceso solo a IPs internas, VPN, o roles administrativos.
 
 ---
 
