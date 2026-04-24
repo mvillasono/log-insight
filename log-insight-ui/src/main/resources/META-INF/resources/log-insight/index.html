@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Log Insight</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- ── Header ───────────────────────────────────────────────── -->
+  <header class="header">
+    <div class="header-brand">
+      <span class="brand-gem">◆</span>
+      <span class="brand-name">Log Insight</span>
+    </div>
+    <div class="header-center">
+      <span id="service-name" class="service-chip">—</span>
+      <span class="live-dot"></span>
+      <span class="live-label">live</span>
+    </div>
+    <div class="header-right">
+      <span id="last-updated" class="last-updated">—</span>
+      <button id="refresh-btn" class="icon-btn" title="Refresh now">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M23 4v6h-6"/><path d="M1 20v-6h6"/>
+          <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/>
+        </svg>
+      </button>
+    </div>
+  </header>
+
+  <!-- ── Main ─────────────────────────────────────────────────── -->
+  <main class="main">
+
+    <!-- Stats -->
+    <div class="stats-grid">
+      <div class="stat-card" data-sev="critical">
+        <div class="stat-label">CRITICAL</div>
+        <div class="stat-value" id="cnt-critical">0</div>
+      </div>
+      <div class="stat-card" data-sev="high">
+        <div class="stat-label">HIGH</div>
+        <div class="stat-value" id="cnt-high">0</div>
+      </div>
+      <div class="stat-card" data-sev="medium">
+        <div class="stat-label">MEDIUM</div>
+        <div class="stat-value" id="cnt-medium">0</div>
+      </div>
+      <div class="stat-card" data-sev="low">
+        <div class="stat-label">LOW</div>
+        <div class="stat-value" id="cnt-low">0</div>
+      </div>
+    </div>
+
+    <!-- Toolbar -->
+    <div class="toolbar">
+      <div class="search-wrap">
+        <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+        </svg>
+        <input id="search" class="search-input" type="search" placeholder="Search by logger, message, root cause…">
+      </div>
+      <div class="filter-pills">
+        <button class="pill active" data-filter="ALL">All</button>
+        <button class="pill" data-filter="CRITICAL">Critical</button>
+        <button class="pill" data-filter="HIGH">High</button>
+        <button class="pill" data-filter="MEDIUM">Medium</button>
+        <button class="pill" data-filter="LOW">Low</button>
+      </div>
+    </div>
+
+    <!-- List -->
+    <div id="analyses-list" class="analyses-list">
+      <div id="empty-state" class="empty-state">
+        <div class="empty-icon">◎</div>
+        <p class="empty-title">No analyses yet</p>
+        <p class="empty-sub">Errors in your microservice will appear here automatically.</p>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- ── Detail Modal ──────────────────────────────────────────── -->
+  <div id="overlay" class="overlay hidden">
+    <div class="modal" role="dialog" aria-modal="true">
+
+      <div class="modal-header">
+        <div class="modal-header-left">
+          <span id="m-severity" class="badge badge-critical">—</span>
+          <span id="m-service" class="modal-service">—</span>
+        </div>
+        <button id="modal-close" class="icon-btn modal-close-btn" aria-label="Close">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M18 6 6 18M6 6l12 12"/>
+          </svg>
+        </button>
+      </div>
+
+      <div class="modal-meta">
+        <span id="m-logger" class="mono">—</span>
+        <span class="dot-sep">·</span>
+        <span id="m-time">—</span>
+        <span class="dot-sep">·</span>
+        <span id="m-occurrences">—</span>
+      </div>
+      <div id="m-http" class="modal-http" style="display:none"></div>
+
+      <div class="modal-body">
+
+        <section class="detail-section">
+          <h3 class="detail-heading">Root Cause</h3>
+          <p id="m-root-cause" class="detail-text highlight-text">—</p>
+        </section>
+
+        <section class="detail-section">
+          <h3 class="detail-heading">Analysis</h3>
+          <p id="m-analysis" class="detail-text">—</p>
+        </section>
+
+        <section class="detail-section">
+          <h3 class="detail-heading">Suggestions</h3>
+          <ol id="m-suggestions" class="suggestions-list"></ol>
+        </section>
+
+        <section class="detail-section">
+          <h3 class="detail-heading">
+            Original Log
+            <span class="badge-small">sanitized</span>
+          </h3>
+          <pre id="m-log" class="code-block">—</pre>
+        </section>
+
+        <section class="detail-section" id="stack-section">
+          <h3 class="detail-heading">Stack Trace</h3>
+          <pre id="m-stack" class="code-block code-block--stack">—</pre>
+        </section>
+
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

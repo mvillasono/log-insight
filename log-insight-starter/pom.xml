@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>io.github.mvillasono</groupId>
+        <artifactId>log-insight-parent</artifactId>
+        <version>1.0.0-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>log-insight-spring-boot-starter</artifactId>
+    <name>Log Insight Spring Boot Starter</name>
+    <description>Starter — agrega esta dependencia a tu proyecto para activar Log Insight</description>
+
+    <dependencies>
+        <dependency>
+            <groupId>io.github.mvillasono</groupId>
+            <artifactId>log-insight-autoconfigure</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.github.mvillasono</groupId>
+            <artifactId>log-insight-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.github.mvillasono</groupId>
+            <artifactId>log-insight-ui</artifactId>
+        </dependency>
+    </dependencies>
+</project>

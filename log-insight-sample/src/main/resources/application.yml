@@ -1,0 +1,71 @@
+spring:
+  profiles:
+    active:
+      - local
+  application:
+    name: log-insight-sample
+  data:
+    redis:
+      host: localhost
+      port: 6379
+  ai:
+    openai:
+      api-key: ${OPENAI_API_KEY:replace-with-your-key}
+      chat:
+        options:
+          model: gpt-4o-mini
+
+# ── Log Insight ──────────────────────────────────────────────────
+log-insight:
+  enabled: true
+  ai:
+    language: Spanish    # English | Spanish | Portuguese | French | etc.
+
+  capture:
+    levels: [ERROR, WARN]
+    max-stack-lines: 30
+    context-lines: 5
+
+  sanitization:
+    enabled: true
+    built-in:
+      emails: true
+      credit-cards: true
+      jwt-tokens: true
+      ip-addresses: true
+      uuids: false
+    custom:
+      - name: "user-id"
+        pattern: "userId=\\d+"
+        replacement: "userId=[REDACTED]"
+
+  deduplication:
+    enabled: true
+    window: 5m
+
+  rate-limit:
+    max-per-minute: 20
+    max-per-hour: 200
+
+  ui:
+    enabled: true
+    path: /log-insight
+
+  default-output: console
+
+  sinks:
+    console:
+      enabled: true
+    actuator:
+      enabled: true
+      max-history: 100
+
+# ── Server ───────────────────────────────────────────────────────
+server:
+  port: 8080
+
+# ── Logging ──────────────────────────────────────────────────────
+logging:
+  level:
+    io.github.mvillasono.loginsight: DEBUG
+    io.github.mvillasono.loginsight.sample: INFO

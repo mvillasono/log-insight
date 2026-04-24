@@ -1,0 +1,38 @@
+# Build
+target/
+*.class
+*.jar
+*.war
+
+# Maven
+.mvn/timing.properties
+!.mvn/wrapper/maven-wrapper.jar
+
+# IDE
+.idea/
+*.iml
+*.iws
+.vscode/
+*.swp
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Env — nunca commitear API keys
+.env
+.env.local
+application-local.yml
+application-secret.yml
+application-*.yml
+!application.yml
+
+# Maven wrapper
+.mvn/wrapper/maven-wrapper.properties
+
+# Spring Boot
+spring-shell.log
