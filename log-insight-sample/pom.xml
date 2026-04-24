@@ -14,6 +14,10 @@
     <name>Log Insight Sample</name>
     <description>App de demo y playground para contribuidores — genera errores de ejemplo y muestra el dashboard</description>
 
+    <properties>
+        <maven.deploy.skip>true</maven.deploy.skip>
+    </properties>
+
     <dependencies>
         <!-- El starter completo -->
         <dependency>

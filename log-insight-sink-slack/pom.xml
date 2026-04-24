@@ -14,6 +14,10 @@
     <name>Log Insight Sink — Slack</name>
     <description>Sink built-in para notificaciones a canales de Slack vía webhook</description>
 
+    <properties>
+        <maven.deploy.skip>true</maven.deploy.skip>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>io.github.mvillasono</groupId>

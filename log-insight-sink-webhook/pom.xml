@@ -14,6 +14,10 @@
     <name>Log Insight Sink — Webhook</name>
     <description>Sink built-in para notificaciones vía HTTP webhook configurable</description>
 
+    <properties>
+        <maven.deploy.skip>true</maven.deploy.skip>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>io.github.mvillasono</groupId>
