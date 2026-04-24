@@ -104,6 +104,7 @@ log-insight:
 
   ai:
     provider: openai          # openai | anthropic | ollama (solo trazabilidad)
+    language: Spanish         # idioma de las respuestas de análisis
 
   capture:
     levels: [ERROR, WARN]     # niveles a capturar
